@@ -1,0 +1,35 @@
+<html>
+    <header>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script type="text/javascript">
+
+            function secondClick() {
+<!--                share('分享的标题','分享的内容','图片地址');-->
+
+                window.webkit.messageHandlers.removeNavigationBar.postMessage('remove navigationBar');
+
+            }
+
+        function showAlert(message){
+            alert(message);
+        }
+
+        function thirdClick(){
+
+            window.webkit.messageHandlers.AddNavigationBar.postMessage('add navigationBar');
+
+        }
+
+        </script>
+    </header>
+
+    <body bgcolor="green">
+        <h2> 这里是第二种方式 </h2>
+        <br/>
+        <br/>
+        <button type="button" onclick="secondClick()">Click Me!</button>
+        <button type="button" onclick="thirdClick()">ThirdClick!</button>
+
+    </body>
+</html>
+
