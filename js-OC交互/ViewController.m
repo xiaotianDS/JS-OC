@@ -61,6 +61,66 @@
 
 }
 
+#pragma mark - WKUIDelegate
+//当把JS返回给控制器,然后弹窗就是这样设计的
+- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提醒" message:message preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+        completionHandler();
+    }]];
+
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+#pragma mark - WKScriptMessageHandler
+- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
+{
+    //    message.body  --  Allowed types are NSNumber, NSString, NSDate, NSArray,NSDictionary, and NSNull.
+    NSLog(@"body:%@",message.body);
+    if ([message.name isEqualToString:@"AddNavigationBar"]) {
+        NSLog(@"Add NavigationBar");
+
+        [self alertWithTitle:nil message:@"Add NavigationBar"];
+
+        [self addNavigationBar];
+
+    } else if ([message.name isEqualToString:@"removeNavigationBar"]) {
+        NSLog(@"remove NavigationBar");
+        [self alertWithTitle:nil message:@"remove NavigationBar"];
+
+        [self removeNavigationBar];
+
+    }
+
+}
+
+- (void)addNavigationBar
+{
+//    self.navigationController.navigationBar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO];
+
+    self.webView.frame = CGRectMake(0, 64, SCREENW, SCREENH-64);
+}
+
+- (void)removeNavigationBar
+{
+//    self.navigationController.navigationBar.hidden = YES;
+    [self.navigationController setNavigationBarHidden:YES];
+
+    self.webView.frame = CGRectMake(0, 0, SCREENW, SCREENH);
+
+}
+
+- (void)alertWithTitle:(NSString *)title message:(NSString *)messageStr
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title ? title :@"原生弹窗" message:messageStr preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:@"sure" style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+
 #pragma mark - WKNavigationDelegate
 //准备加载页面
 - (void)webView:(WKWebView *)webView didStartProvisionalNavigation:(WKNavigation *)navigation
@@ -120,66 +180,7 @@
     //允许跳转
     decisionHandler(WKNavigationResponsePolicyAllow);
     //不允许跳转
-//    decisionHandler(WKNavigationResponsePolicyCancel);
-}
-
-#pragma mark - WKUIDelegate
-//当把JS返回给控制器,然后弹窗就是这样设计的
-- (void)webView:(WKWebView *)webView runJavaScriptAlertPanelWithMessage:(NSString *)message initiatedByFrame:(WKFrameInfo *)frame completionHandler:(void (^)(void))completionHandler
-{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"提醒" message:message preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"知道了" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
-        completionHandler();
-    }]];
-
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
-#pragma mark - WKScriptMessageHandler
-- (void)userContentController:(WKUserContentController *)userContentController didReceiveScriptMessage:(WKScriptMessage *)message
-{
-    //    message.body  --  Allowed types are NSNumber, NSString, NSDate, NSArray,NSDictionary, and NSNull.
-    NSLog(@"body:%@",message.body);
-    if ([message.name isEqualToString:@"AddNavigationBar"]) {
-        NSLog(@"Add NavigationBar");
-
-        [self alertWithTitle:nil message:@"Add NavigationBar"];
-
-        [self addNavigationBar];
-
-    } else if ([message.name isEqualToString:@"removeNavigationBar"]) {
-        NSLog(@"remove NavigationBar");
-        [self alertWithTitle:nil message:@"remove NavigationBar"];
-
-        [self removeNavigationBar];
-
-    }
-
-}
-
-- (void)addNavigationBar
-{
-//    self.navigationController.navigationBar.hidden = NO;
-    [self.navigationController setNavigationBarHidden:NO];
-
-    self.webView.frame = CGRectMake(0, 64, SCREENW, SCREENH-64);
-}
-
-- (void)removeNavigationBar
-{
-//    self.navigationController.navigationBar.hidden = YES;
-    [self.navigationController setNavigationBarHidden:YES];
-
-    self.webView.frame = CGRectMake(0, 0, SCREENW, SCREENH);
-
-}
-
-- (void)alertWithTitle:(NSString *)title message:(NSString *)messageStr
-{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title ? title :@"原生弹窗" message:messageStr preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:@"sure" style:UIAlertActionStyleCancel handler:nil];
-    [alert addAction:action];
-    [self presentViewController:alert animated:YES completion:nil];
+    //    decisionHandler(WKNavigationResponsePolicyCancel);
 }
 
 
